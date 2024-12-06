@@ -1,15 +1,14 @@
 from page_analyzer.db import save_data, select_all
-
+from page_analyzer.utils import is_url_valid
 
 from flask import Flask
-from flask import render_template, request
+from flask import render_template, request, flash
+import os
 
 
 app = Flask(__name__)
 
-
-def is_valid(url):
-    return True
+app.config['SECRET_KEY'] = os.getenv("SECRET_KEY")
 
 
 @app.route("/")
@@ -22,7 +21,13 @@ def urls():
     if request.method == "POST":
         # save the data
         url = request.form.get("url")
-        save_data(url)
+        if is_url_valid(url):
+            save_data(url)
+        else:
+            # flash error
+            flash("Wrong URL! Try again")
+            return render_template("index.html",
+                                   value=url)
     # show all the data
     all_urls = select_all()
     return render_template("all_urls_page.html",
