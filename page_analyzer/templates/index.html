@@ -4,10 +4,10 @@
     <div class="container bg-light-emphasis py-5">
         <h1 class="display-3 text-center">Анализатор страниц</h1>
         <h2 class="lead my-3 text-center">Бесплатно проверяйте сайты на SEO-пригодность</h2>
-        <form class="row mx-auto" action="urls" method="post">
+        <form class="row mx-auto" action="{{ url_for('urls_post') }}" method="post">
             <div class="col-7 offset-md-2 px-0">
                 <label for="input-site-url" class="visually-hidden">Url сайта для проверки</label>
-                <input id="input-site-url" name="url" class="col-9 form-control" type="text" placeholder="https://example.com" value="{{ value if value }}" required>
+                <input id="input-site-url" name="url" class="col-9 form-control" type="text" placeholder="https://example.com" value="{{ data.url|default('') if data }}" required>
             </div>
             <div class="col-3 px-2">
                 <button class="col btn btn-primary" type="submit">Проверить</button>

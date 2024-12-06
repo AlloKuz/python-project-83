@@ -1,8 +1,8 @@
 from page_analyzer.db import save_data, select_all
-from page_analyzer.utils import is_url_valid
+from page_analyzer.utils import url_validator
 
 from flask import Flask
-from flask import render_template, request, flash
+from flask import render_template, request, flash, redirect, url_for
 import os
 
 
@@ -16,19 +16,20 @@ def index():
     return render_template("index.html")
 
 
-@app.route("/urls", methods=['POST', 'GET'])
-def urls():
-    if request.method == "POST":
-        # save the data
-        url = request.form.get("url")
-        if is_url_valid(url):
-            save_data(url)
-        else:
-            # flash error
-            flash("Wrong URL! Try again")
-            return render_template("index.html",
-                                   value=url)
-    # show all the data
-    all_urls = select_all()
+@app.route("/urls", methods=["GET"])
+def urls_get():
+    all_urls = select_all() or []
     return render_template("all_urls_page.html",
-                           urls=all_urls if all_urls else [])
+                           urls=all_urls)
+
+
+@app.route("/urls", methods=["POST"])
+def urls_post():
+    data = request.form.to_dict()
+    errors = url_validator(data)
+    if errors:
+        flash(errors["url"])
+        return render_template("index.html", data=data), 422
+    new_url = data["url"] #TODO normalization
+    save_data(new_url)
+    return redirect(url_for("urls_get"))
