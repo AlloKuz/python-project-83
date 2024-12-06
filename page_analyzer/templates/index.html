@@ -7,7 +7,12 @@
         <form class="row mx-auto" action="{{ url_for('urls_post') }}" method="post">
             <div class="col-7 offset-md-2 px-0">
                 <label for="input-site-url" class="visually-hidden">Url сайта для проверки</label>
-                <input id="input-site-url" name="url" class="col-9 form-control" type="text" placeholder="https://example.com" value="{{ data.url|default('') if data }}" required>
+                <input id="input-site-url" name="url" class="col-9 form-control {{ 'is-invalid' if errors }}" type="text" placeholder="https://example.com" value="{{ data.url|default('') if data }}" required>
+                {% if errors %}
+                    <div class="invalid-feedback">
+                        {{ errors.url }}
+                    </div>
+                {% endif %}
             </div>
             <div class="col-3 px-2">
                 <button class="col btn btn-primary" type="submit">Проверить</button>

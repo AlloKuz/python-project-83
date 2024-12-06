@@ -2,6 +2,9 @@ import psycopg2
 import os
 from dotenv import load_dotenv
 from datetime import datetime
+from collections import namedtuple
+
+URLtuple = namedtuple("URLtuple", ["id", "name", "created_at"])
 
 
 def create_connection():
@@ -26,7 +29,19 @@ def save_data(url):
 
 
 def select_all():
+    data = []
     with create_connection() as conn, conn.cursor() as curs:
-        curs.execute("""SELECT name, created_at FROM urls""")
-        data = curs.fetchall()
+        curs.execute("""SELECT id, name, created_at
+                        FROM urls
+                        ORDER BY created_at DESC""")
+        for el in curs.fetchall():
+            data.append(URLtuple._make(el))
     return data
+
+
+def find_url_by_id(id_):
+    with create_connection() as conn, conn.cursor() as curs:
+        curs.execute("""SELECT id, name, created_at
+                        FROM urls
+                        WHERE id = %s""", [str(id_)])
+        return URLtuple._make(curs.fetchone())

@@ -2,11 +2,22 @@
 
 {% block content %}
     <div class="container bg-light-emphasis py-5">
-        <h2 class="lead my-3 text-left">Сохраненные адреса:</h2>
-        <ul>
+        <h2 class="lead my-3 text-left">Сайты:</h2>
+        <table class="table" data-test="urls">
+            <thead>
+                <th>ID</th>
+                <th>Имя</th>
+                <th>Дата создания</th>
+            </thead>
+            <tbody>
             {% for url in urls %}
-                <li>{{ url[0] }} {{ url[1] }}</li>
+                <tr>
+                    td>{{ url.id }}</td>
+                    <td><a href="{{ url_for('url_show', id_=url.id) }}">{{ url.name }}</a></td>
+                    <td>{{ url.created_at }}</td>
+                </tr>
             {% endfor %}
-        </ul>
+            </tbody>
+        </table>
     </div>
 {% endblock %}

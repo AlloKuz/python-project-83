@@ -1,0 +1,23 @@
+{% extends "layout/default.html" %}
+
+{% block content %}
+    <div class="container bg-light-emphasis py-5">
+        <h1 class="h1 text-left">Сайт: {{ data.name }}</h1>
+        <table class="table" data-test="url">
+            <tbody>
+                <tr>
+                    <th scope="row">ID</th>
+                    <td>{{ data.id }}</td>
+                </tr>
+                <tr>
+                    <th scope="row">Имя</th>
+                    <td>{{ data.name }}</td>
+                </tr>
+                <tr>
+                    <th scope="row">Дата создания</th>
+                    <td>{{ data.created_at }}</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+{% endblock %}
