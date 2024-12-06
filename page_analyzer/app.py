@@ -1,4 +1,4 @@
-from page_analyzer.db import get_conn
+from page_analyzer.db import create_connection
 
 from flask import Flask
 from flask import render_template

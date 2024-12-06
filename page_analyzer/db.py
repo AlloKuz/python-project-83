@@ -6,12 +6,8 @@ from dotenv import load_dotenv
 def create_connection():
     load_dotenv()
     
-        DATABASE_URL = os.getenv("DATABASE_URL")
+    DATABASE_URL = os.getenv("DATABASE_URL")
 
-    try:
-        conn = psycopg2.connect(DATABASE_URL)
-    except:
-        print("Cannot connect to database!", file=stderr)
-        return None
+    conn = psycopg2.connect(DATABASE_URL)
 
     return conn
