@@ -1,0 +1,12 @@
+{% extends "layout/default.html" %}
+
+{% block content %}
+    <div class="container bg-light-emphasis py-5">
+        <h2 class="lead my-3 text-left">Сохраненные адреса:</h2>
+        <ul>
+            {% for url in urls %}
+                <li>{{ url[0] }} {{ url[1] }}</li>
+            {% endfor %}
+        </ul>
+    </div>
+{% endblock %}
