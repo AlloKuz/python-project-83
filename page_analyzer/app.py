@@ -1,4 +1,6 @@
-from page_analyzer.db import save_data, select_all, find_url_by_id
+from page_analyzer.db import (save_data,
+                              select_checks, select_checkinfo,
+                              find_url_by_id, save_url)
 from page_analyzer.utils import url_validator, url_normalize
 
 from flask import Flask
@@ -18,7 +20,7 @@ def index():
 
 @app.route("/urls", methods=["GET"])
 def urls_get():
-    all_urls = select_all() or []
+    all_urls = select_checkinfo() or []
     return render_template("all_urls_page.html",
                            urls=all_urls)
 
@@ -36,7 +38,16 @@ def urls_post():
 
 
 @app.route("/urls/<id_>", methods=["GET"])
-def url_show(id_):
+def urls_show(id_):
     data = find_url_by_id(id_)
+    checks = select_checks(id_)
     return render_template("show.html",
-                           data=data)
+                           data=data,
+                           checks=checks)
+
+
+@app.route("/urls/<id_>/check", methods=["POST"])
+def urls_check(id_):
+    save_url(id_)
+    flash("Страница успешно проверена", "success")
+    return redirect(url_for("urls_show", id_=id_))
