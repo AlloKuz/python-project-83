@@ -18,7 +18,6 @@ def save_data(conn, url):
     with conn.cursor() as curs:
         curs.execute("""INSERT INTO urls (name, created_at) VALUES
                         (%s, %s)""", [url, datetime.now()])
-    conn.commit()
 
 
 def select_all(conn):
