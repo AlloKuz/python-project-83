@@ -3,6 +3,7 @@ from page_analyzer.db import (save_data,
                               find_url_by_id, find_url_by_name,
                               save_check)
 from page_analyzer.utils import url_validator, url_normalize
+from page_analyzer.parser import parse_html
 
 from flask import Flask
 from flask import render_template, request, flash, redirect, url_for
@@ -58,14 +59,19 @@ def urls_post():
 @app.route("/urls/<id_>/check", methods=["POST"])
 def urls_check(id_):
     url_data = find_url_by_id(id_)
-    status_code = 404
+    status_code = None
     try:
         req = requests.get(url_data.name)
+        status_code = req.status_code
         req.raise_for_status()
     except Exception as e:
         print(f"Error! {e}")
         flash("Произошла ошибка при проверке", "danger")
     else:
-        save_check(id_, status_code=status_code)
+        parsed_data = parse_html(url_data.name)
+        save_check(id_,
+                   status_code=status_code,
+                   title=parsed_data["title"],
+                   h1=parsed_data["h1"])
         flash("Страница успешно проверена", "success")
     return redirect(url_for("urls_show", id_=id_))

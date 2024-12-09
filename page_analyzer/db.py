@@ -44,24 +44,31 @@ def select_urls():
     return data
 
 
-def select_checkinfo():
-    data = []
+def select_last_check_info(id_):
     with create_connection() as conn, conn.cursor() as curs:
-        curs.execute("""WITH last_record AS (
-                        SELECT url_id, MAX(created_at) last_check
-                        FROM url_checks
-                        GROUP BY url_id)
+        curs.execute("""SELECT urls.id,
+                               urls.name,
+                               uc.created_at AS last_check,
+                               uc.status_code
+                        FROM url_checks AS uc
+                        FULL JOIN urls ON uc.url_id=urls.id
+                        WHERE urls.id=%s
+                        ORDER BY uc.created_at DESC LIMIT 1
+                        """, [id_])
+        data = curs.fetchone()
+        if data:
+            return URLCheckTuple._make(data)
 
-                        SELECT urls.id, urls.name, lr.last_check, uc.status_code
-                        FROM urls
-                        LEFT JOIN last_record as lr
-                            ON urls.id=lr.url_id
-                        LEFT JOIN url_checks uc ON urls.id=uc.url_id
-                        ORDER BY uc.created_at;
-                        """)
-        for el in curs.fetchall():
-            data.append(URLCheckTuple._make(el))
-    return data
+
+def select_checkinfo():
+    urls = select_urls()
+    checks = []
+    for url in urls:
+        info = select_last_check_info(url.id)
+        if info:
+            checks.append(info)
+    print(checks)
+    return checks
 
 
 def select_checks(id_):
@@ -97,8 +104,20 @@ def find_url_by_name(name):
     return False
 
 
-def save_check(id_, *, status_code=None):
+def save_check(id_, *, status_code=None,
+               title=None, h1=None, description=None):
     with create_connection() as conn, conn.cursor() as curs:
-        curs.execute("""INSERT INTO url_checks (url_id, created_at, status_code)
-                        VALUES (%s, %s, %s)""",
-                    [id_, datetime.now(), status_code])
+        curs.execute("""INSERT INTO url_checks
+                        (url_id,
+                         created_at,
+                         status_code,
+                         title,
+                         h1,
+                         description)
+                        VALUES (%s, %s, %s, %s, %s, %s)""",
+                    [id_,
+                     datetime.now(),
+                     status_code,
+                     title,
+                     h1,
+                     description])
