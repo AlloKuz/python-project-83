@@ -3,9 +3,9 @@ import requests
 
 
 def parse_html(url, parser=requests.get):
-    text = parser(url)
+    site_data = parser(url)
     try:
-        soup = BeautifulSoup(text, "html.parser")
+        soup = BeautifulSoup(site_data.text, "html.parser")
         h1_tag = soup.find("h1") or None
         description = soup.find("meta",
                                 attrs={"name": "description"}).get("content")

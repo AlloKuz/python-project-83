@@ -4,19 +4,6 @@ import os
 import pytest
 
 
-class DbMock:
-
-    def __enter__(self):
-        pass
-
-    def __exit__(self):
-        pass
-
-    def cursor(self):
-        # return cursor-like object
-        pass
-
-
 @pytest.fixture
 def app():
     new_app = app_
@@ -41,3 +28,15 @@ def runner(app):
 def test_index(client):
     response = client.get("/")
     assert "Бесплатно проверяйте сайты на SEO-пригодность" in response.text
+
+
+def test_urls(client):
+    response = client.get("/urls")
+    assert "Последняя проверка" in response.text
+
+
+def test_index_form(client):
+    response = client.post("/urls", data={
+        "url": "https://hexlet.io",
+    })
+    assert response.status_code == 302
