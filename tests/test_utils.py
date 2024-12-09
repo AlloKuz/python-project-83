@@ -16,7 +16,7 @@ import pytest
         {"url": "nothexlet.io"},
         {"url": "Wrong URL!"}
     ),
-    ])
+])
 def test_url_validate(url, answer):
     assert url_validate(url) == answer
 
@@ -24,6 +24,6 @@ def test_url_validate(url, answer):
 @pytest.mark.parametrize("url, answer", [
     ("https://hexlet.io", "https://hexlet.io"),
     ("http://google.com/hexxlo?params=1", "http://google.com")
-    ])
+])
 def test_normalize(url, answer):
     assert url_normalize(url) == answer
