@@ -1,5 +1,5 @@
 from page_analyzer.db import (save_url,
-                              get_checks_by_url_id, get_lastchecks_info,
+                              get_checks_by_url_id, get_urls_with_last_checks,
                               find_url_by_id, find_url_by_name,
                               save_check)
 from page_analyzer.utils import url_validate, url_normalize
@@ -11,17 +11,12 @@ import os
 import requests
 import uuid
 import logging
+from dotenv import load_dotenv
 
+
+load_dotenv()
 
 logger = logging.getLogger(__name__)
-
-try:
-    from dotenv import load_dotenv
-
-    load_dotenv()
-except Exception as e:
-    logger.info(e)
-
 
 DEBUG = os.getenv("FLASK_DEBUG")
 
@@ -50,7 +45,7 @@ def index():
 
 @app.route("/urls", methods=["GET"])
 def urls_get():
-    get_urls_with_lastcheck_info = get_lastchecks_info()
+    get_urls_with_lastcheck_info = get_urls_with_last_checks()
     return render_template("all_urls_page.html",
                            urls=get_urls_with_lastcheck_info)
 

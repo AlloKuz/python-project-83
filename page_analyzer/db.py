@@ -9,24 +9,21 @@ logger = logging.getLogger(__name__)
 
 def create_connection():
     db_url = os.getenv("DATABASE_URL")
-    try:
-        conn = psycopg2.connect(db_url,
-                                cursor_factory=RealDictCursor)
-        return conn
-    except psycopg2.Error as e:
-        logger.error(f'Unable to connect!\n{e}')
-        raise e
+    conn = psycopg2.connect(db_url)
+    return conn
 
 
 def save_url(url):
-    with create_connection() as conn, conn.cursor() as curs:
+    with create_connection() as conn, conn.cursor(
+            cursor_factory=RealDictCursor) as curs:
         curs.execute("""INSERT INTO urls (name) VALUES
                         (%s) RETURNING id""", [url])
         return curs.fetchone()
 
 
 def get_urls():
-    with create_connection() as conn, conn.cursor() as curs:
+    with create_connection() as conn, conn.cursor(
+            cursor_factory=RealDictCursor) as curs:
         curs.execute("""SELECT id, name, created_at
                         FROM urls
                         ORDER BY created_at DESC""")
@@ -34,7 +31,7 @@ def get_urls():
     return []
 
 
-def get_lastchecks():
+def get_urls_with_last_checks():
     sql = """
         WITH most_recent_records AS (
             SELECT url_id, MAX(created_at) AS last_check
@@ -54,15 +51,10 @@ def get_lastchecks():
         WHERE mrr.last_check IS NULL OR mrr.last_check=uc.created_at
         ORDER BY urls.created_at DESC;
     """
-    with create_connection() as conn, conn.cursor() as curs:
+    with create_connection() as conn, conn.cursor(
+            cursor_factory=RealDictCursor) as curs:
         curs.execute(sql)
         return curs.fetchall()
-
-
-def get_lastchecks_info():
-    checks_info = []
-    checks_info = get_lastchecks()
-    return checks_info
 
 
 def get_url_ids():
@@ -76,7 +68,8 @@ def get_url_ids():
 
 
 def get_checks_by_url_id(id_):
-    with create_connection() as conn, conn.cursor() as curs:
+    with create_connection() as conn, conn.cursor(
+            cursor_factory=RealDictCursor) as curs:
         curs.execute("""SELECT id, status_code, h1,
                                title, description, created_at
                         FROM url_checks
@@ -87,7 +80,8 @@ def get_checks_by_url_id(id_):
 
 
 def find_url_by_id(id_):
-    with create_connection() as conn, conn.cursor() as curs:
+    with create_connection() as conn, conn.cursor(
+            cursor_factory=RealDictCursor) as curs:
         curs.execute("""SELECT id, name, created_at
                         FROM urls
                         WHERE id = %s""", [str(id_)])
@@ -95,14 +89,15 @@ def find_url_by_id(id_):
 
 
 def find_url_by_name(name):
-    with create_connection() as conn, conn.cursor() as curs:
+    with create_connection() as conn, conn.cursor(
+            cursor_factory=RealDictCursor) as curs:
         curs.execute("""SELECT id, name, created_at
                         FROM urls
                         WHERE name = %s""", [name])
         return curs.fetchone()
 
 
-def save_check(id_, *, status_code=None,
+def save_check(url_id, status_code=None,
                title=None, h1=None, description=None):
     with create_connection() as conn, conn.cursor() as curs:
         curs.execute("""INSERT INTO url_checks
@@ -112,7 +107,7 @@ def save_check(id_, *, status_code=None,
                          h1,
                          description)
                         VALUES (%s, %s, %s, %s, %s)""",
-                     [id_,
+                     [url_id,
                       status_code,
                       title,
                       h1,

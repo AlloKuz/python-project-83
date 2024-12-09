@@ -6,11 +6,7 @@ logger = logging.getLogger(__name__)
 
 
 def parse_html(html_text):
-    try:
-        soup = BeautifulSoup(html_text, "html.parser")
-    except Exception as e:
-        logger.error(f"Error: {e}! Can't parse html.")
-        return {}
+    soup = BeautifulSoup(html_text, "html.parser")
     h1_tag = soup.find("h1") or None
     description = soup.find("meta",
                             attrs={"name": "description"})
