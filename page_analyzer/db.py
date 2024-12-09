@@ -39,39 +39,50 @@ def get_urls():
     return []
 
 
-def get_lastcheck_by_url_id(id_):
+def get_lastchecks(ids):
+    sql = """
+        WITH most_recent_records AS (
+            SELECT url_id, MAX(created_at) AS last_check
+            FROM url_checks
+            GROUP BY url_id
+        )
+
+        SELECT urls.id,
+               urls.name,
+               uc.status_code,
+               uc.created_at AS last_check
+        FROM urls
+        LEFT JOIN url_checks AS uc
+            ON urls.id=uc.url_id
+        LEFT JOIN most_recent_records AS mrr
+            ON uc.url_id=mrr.url_id
+        WHERE mrr.last_check IS NULL OR mrr.last_check=uc.created_at;
+    """
     with create_connection() as conn, conn.cursor() as curs:
-        curs.execute("""SELECT urls.id,
-                               urls.name,
-                               uc.created_at AS last_check,
-                               uc.status_code AS status_code
-                        FROM url_checks AS uc
-                        FULL JOIN urls ON uc.url_id=urls.id
-                        WHERE urls.id=%s
-                        ORDER BY uc.created_at DESC LIMIT 1
-                        """, [id_])
-        return curs.fetchone()
+        print(ids)
+        print(curs.mogrify(sql, (ids,)))
+        curs.execute(sql, (ids,))
+        return curs.fetchall()
 
 
 def get_lastchecks_info():
-    urls = get_urls()
-    checks = []
+    url_ids = get_url_ids()
+    checks_info = []
     try:
-        for url in urls:
-            info = get_lastcheck_by_url_id(url["id"])
-            if info:
-                checks.append(info)
+        checks_info = get_lastchecks(url_ids)
     except Exception as e:
         logger.error(f"Connection error! {e}")
-    return checks
+    return checks_info
 
 
 def get_url_ids():
     sql = """SELECT DISTINCT id FROM urls"""
     try:
-        with create_connection() as conn, conn.cursor() as curs:
+        with create_connection() as conn, conn.cursor(
+                cursor_factory=psycopg2.extensions.cursor) as curs:
             curs.execute(sql)
-            return curs.fetchall()
+            data = curs.fetchall()
+            return tuple([url_id[0] for url_id in data])
     except psycopg2.Error as e:
         logger.error(e)
     return []
