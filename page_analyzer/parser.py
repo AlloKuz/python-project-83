@@ -1,5 +1,9 @@
 from bs4 import BeautifulSoup
 import requests
+import logging
+
+
+logger = logging.getLogger(__name__)
 
 
 def get_content(url):
@@ -19,5 +23,5 @@ def parse_html(url, parser=get_content):
                 "h1": h1_tag.text if h1_tag else None,
                 "description": description}
     except Exception as e:
-        print(f"Error: {e}! Can't parse a site '{url}'")
+        logger.error(f"Error: {e}! Can't parse a site '{url}'")
     return {}

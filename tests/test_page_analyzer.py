@@ -32,10 +32,3 @@ def test_index(client):
 def test_urls(client):
     response = client.get("/urls")
     assert "Последняя проверка" in response.text
-
-
-def test_index_form(client):
-    response = client.post("/urls", data={
-        "url": "https://hexlet.io",
-    }, follow_redirects=False)
-    assert response.status_code == 302

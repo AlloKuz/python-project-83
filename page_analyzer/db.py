@@ -2,6 +2,10 @@ import psycopg2
 import os
 from datetime import datetime
 from collections import namedtuple
+import logging
+
+
+logger = logging.getLogger(__name__)
 
 URLtuple = namedtuple("URLtuple",
                       "id name created_at")
@@ -19,7 +23,7 @@ def create_connection():
         conn = psycopg2.connect(DATABASE_URL)
         return conn
     except psycopg2.Error as e:
-        print(f'Unable to connect!\n{e}')
+        logger.error(f'Unable to connect!\n{e}')
         raise e
 
 
@@ -29,7 +33,7 @@ def save_data(url):
             curs.execute("""INSERT INTO urls (name, created_at) VALUES
                             (%s, %s)""", [url, datetime.now()])
     except psycopg2.Error as e:
-        print(f"Connection error! {e}")
+        logger.error(f"Connection error! {e}")
 
 
 def select_urls():
@@ -43,7 +47,7 @@ def select_urls():
                 data.append(URLtuple._make(el))
         return data
     except psycopg2.Error as e:
-        print(f"Connection error! {e}")
+        logger.error(f"Connection error! {e}")
     return []
 
 
@@ -63,7 +67,7 @@ def select_last_check_info(id_):
             if data:
                 return URLCheckTuple._make(data)
     except psycopg2.Error as e:
-        print(f"Connection error! {e}")
+        logger.error(f"Connection error! {e}")
     return {}
 
 
@@ -89,7 +93,7 @@ def select_checks(id_):
             for el in curs.fetchall():
                 data.append(CheckTuple._make(el))
     except psycopg2.Error as e:
-        print(e)
+        logger.error(e)
     return data
 
 
@@ -101,7 +105,7 @@ def find_url_by_id(id_):
                             WHERE id = %s""", [str(id_)])
             return URLtuple._make(curs.fetchone())
     except Exception as e:
-        print(e)
+        logger.error(e)
     return {}
 
 
@@ -113,7 +117,7 @@ def find_url_by_name(name):
                             WHERE name = %s""", [name])
             return URLtuple._make(curs.fetchone())
     except Exception as e:
-        print(e)
+        logger.error(e)
     return {}
 
 
@@ -136,4 +140,4 @@ def save_check(id_, *, status_code=None,
                           h1,
                           description])
     except Exception as e:
-        print(e)
+        logger.error(e)

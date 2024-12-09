@@ -10,6 +10,10 @@ from flask import render_template, request, flash, redirect, url_for
 import os
 import requests
 import uuid
+import logging
+
+
+logger = logging.getLogger(__name__)
 
 
 def use_dotenv():
@@ -18,12 +22,16 @@ def use_dotenv():
 
         load_dotenv()
     except Exception as e:
-        print(e)
+        logger.info(e)
 
 
 def create_app():
 
     use_dotenv()
+
+    DEBUG = os.getenv("FLASK_DEBUG")
+
+    logging.basicConfig(level=(logging.INFO if not DEBUG else logging.DEBUG))
 
     app = Flask(__name__)
 
@@ -98,5 +106,5 @@ def urls_check(id_):
         flash("Страница успешно проверена", "success")
     except Exception as e:
         flash("Произошла ошибка при проверке", "danger")
-        print(e)
+        logger.error(e)
     return redirect(url_for("urls_show", id_=id_))
