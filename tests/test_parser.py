@@ -6,7 +6,7 @@ FIXTURES_PATH = "tests/fixtures"
 
 
 @pytest.fixture
-def replaced_parser():
+def html_content():
     # with open("tests/fixtures/index.html", "r") as f:
     #     return f.read()
     return """<!DOCTYPE html>
@@ -48,9 +48,8 @@ def replaced_parser():
               </html>"""
 
 
-def test_parse_html(replaced_parser):
-    data = parser.parse_html("tests/fixtures/index.html",
-                             parser=lambda *x: replaced_parser)
+def test_parse_html(html_content):
+    data = parser.parse_html(html_content)
     assert data.get("title") == "Example site 1"
     assert data.get("h1") == "Some inner data"
     assert data.get("description") == "Lorem ipsum"

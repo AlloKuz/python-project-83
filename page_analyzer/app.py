@@ -13,6 +13,8 @@ import uuid
 import logging
 
 
+DEBUG = os.getenv("FLASK_DEBUG")
+
 logger = logging.getLogger(__name__)
 
 
@@ -29,9 +31,9 @@ def create_app():
 
     use_dotenv()
 
-    DEBUG = os.getenv("FLASK_DEBUG")
-
     logging.basicConfig(level=(logging.INFO if not DEBUG else logging.DEBUG))
+    if DEBUG:
+        logger.info("FLASK_DEBUG is on!")
 
     app = Flask(__name__)
 
@@ -94,7 +96,7 @@ def urls_check(id_):
         status_code = req.status_code
         req.raise_for_status()
 
-        parsed_data = parse_html(url_data.name)
+        parsed_data = parse_html(requests.get(url_data.name).text)
 
         if not parsed_data:
             raise Exception("Ошибка при проверке!")
