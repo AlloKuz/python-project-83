@@ -44,7 +44,7 @@ def select_urls():
         return data
     except psycopg2.Error as e:
         print(f"Connection error! {e}")
-        return []
+    return []
 
 
 def select_last_check_info(id_):
@@ -64,7 +64,7 @@ def select_last_check_info(id_):
                 return URLCheckTuple._make(data)
     except psycopg2.Error as e:
         print(f"Connection error! {e}")
-        return URLCheckTuple()
+    return {}
 
 
 def select_checkinfo():
@@ -102,6 +102,7 @@ def find_url_by_id(id_):
             return URLtuple._make(curs.fetchone())
     except Exception as e:
         print(e)
+    return {}
 
 
 def find_url_by_name(name):
@@ -113,7 +114,7 @@ def find_url_by_name(name):
             return URLtuple._make(curs.fetchone())
     except Exception as e:
         print(e)
-    return False
+    return {}
 
 
 def save_check(id_, *, status_code=None,
