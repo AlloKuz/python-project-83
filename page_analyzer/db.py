@@ -1,18 +1,11 @@
 import psycopg2
+from psycopg2.extras import DictCursor
 import os
 from datetime import datetime
-from collections import namedtuple
 import logging
 
 
 logger = logging.getLogger(__name__)
-
-URLtuple = namedtuple("URLtuple",
-                      "id name created_at")
-CheckTuple = namedtuple("CheckTuple",
-                        "id status_code h1 title description created_at")
-URLCheckTuple = namedtuple("URLtuple",
-                           "id name last_check response")
 
 
 def create_connection():
@@ -20,7 +13,8 @@ def create_connection():
     DATABASE_URL = os.getenv("DATABASE_URL")
 
     try:
-        conn = psycopg2.connect(DATABASE_URL)
+        conn = psycopg2.connect(DATABASE_URL,
+                                row_factory=DictCursor)
         return conn
     except psycopg2.Error as e:
         logger.error(f'Unable to connect!\n{e}')
@@ -37,15 +31,12 @@ def save_data(url):
 
 
 def select_urls():
-    data = []
     try:
         with create_connection() as conn, conn.cursor() as curs:
             curs.execute("""SELECT id, name, created_at
                             FROM urls
                             ORDER BY created_at DESC""")
-            for el in curs.fetchall():
-                data.append(URLtuple._make(el))
-        return data
+            return curs.fetchall()
     except psycopg2.Error as e:
         logger.error(f"Connection error! {e}")
     return []
@@ -63,9 +54,7 @@ def select_last_check_info(id_):
                             WHERE urls.id=%s
                             ORDER BY uc.created_at DESC LIMIT 1
                             """, [id_])
-            data = curs.fetchone()
-            if data:
-                return URLCheckTuple._make(data)
+            return curs.fetchone()
     except psycopg2.Error as e:
         logger.error(f"Connection error! {e}")
     return {}
@@ -82,7 +71,6 @@ def select_checkinfo():
 
 
 def select_checks(id_):
-    data = []
     try:
         with create_connection() as conn, conn.cursor() as curs:
             curs.execute("""SELECT id, status_code, h1,
@@ -90,11 +78,10 @@ def select_checks(id_):
                             FROM url_checks
                             WHERE url_id=%s
                             ORDER BY created_at DESC""", [id_])
-            for el in curs.fetchall():
-                data.append(CheckTuple._make(el))
+            return curs.fetchall()
     except psycopg2.Error as e:
         logger.error(e)
-    return data
+    return []
 
 
 def find_url_by_id(id_):
@@ -103,7 +90,7 @@ def find_url_by_id(id_):
             curs.execute("""SELECT id, name, created_at
                             FROM urls
                             WHERE id = %s""", [str(id_)])
-            return URLtuple._make(curs.fetchone())
+            return curs.fetchone()
     except Exception as e:
         logger.error(e)
     return {}
@@ -115,7 +102,7 @@ def find_url_by_name(name):
             curs.execute("""SELECT id, name, created_at
                             FROM urls
                             WHERE name = %s""", [name])
-            return URLtuple._make(curs.fetchone())
+            return curs.fetchone()
     except Exception as e:
         logger.error(e)
     return {}
