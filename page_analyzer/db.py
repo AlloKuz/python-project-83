@@ -58,13 +58,13 @@ def get_lastcheck_by_url_id(id_):
 def get_lastcheck_info():
     urls = get_urls()
     checks = []
-    for url in urls:
-        try:
+    try:
+        for url in urls:
             info = get_lastcheck_by_url_id(url["id"])
             if info:
                 checks.append(info)
-        except Exception as e:
-            logger.error(f"Connection error! {e}")
+    except Exception as e:
+        logger.error(f"Connection error! {e}")
     return checks
 
 
