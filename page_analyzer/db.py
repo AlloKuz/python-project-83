@@ -21,9 +21,6 @@ def create_connection():
         conn = psycopg2.connect(DATABASE_URL)
     except psycopg2.Error as e:
         print('Unable to connect!\n{0}'.format(e))
-    else:
-        print('Connected!')
-
     return conn
 
 
