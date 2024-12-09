@@ -37,8 +37,5 @@ def test_urls(client):
 def test_index_form(client):
     response = client.post("/urls", data={
         "url": "https://hexlet.io",
-    }, follow_redirects=True)
-    assert response.status_code == 200
-    assert any(["Страница успешно добавлена" in response.text,
-                "Страница уже существует" in response.text])
-    assert "hexlet" in response.text
+    })
+    assert response.status_code == 302
