@@ -1,5 +1,6 @@
-import validators
 from urllib.parse import urlparse
+
+import validators
 
 
 def url_validate(data):

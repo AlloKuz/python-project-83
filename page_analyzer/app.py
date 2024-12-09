@@ -1,18 +1,21 @@
-from page_analyzer.db import (save_url,
-                              get_checks_by_url_id, get_urls_with_last_checks,
-                              find_url_by_id, find_url_by_name,
-                              save_check)
-from page_analyzer.utils import url_validate, url_normalize
-from page_analyzer.parser import parse_html
-
-from flask import Flask
-from flask import render_template, request, flash, redirect, url_for
-import os
-import requests
-import uuid
 import logging
-from dotenv import load_dotenv
+import os
+import uuid
 
+import requests
+from dotenv import load_dotenv
+from flask import Flask, flash, redirect, render_template, request, url_for
+
+from page_analyzer.db import (
+    find_url_by_id,
+    find_url_by_name,
+    get_checks_by_url_id,
+    get_urls_with_last_checks,
+    save_check,
+    save_url,
+)
+from page_analyzer.parser import parse_html
+from page_analyzer.utils import url_normalize, url_validate
 
 load_dotenv()
 
