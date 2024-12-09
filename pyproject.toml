@@ -1,7 +1,7 @@
 [tool.poetry]
 name = "hexlet-code"
 version = "0.1.0"
-description = ""
+description = "Check sites for availability; get some site info, e.g. header, description, response code"
 authors = ["AlloKuz <a.o.kuzmin.rus@gmail.com>"]
 readme = "README.md"
 packages = [{include = "page_analyzer"}]

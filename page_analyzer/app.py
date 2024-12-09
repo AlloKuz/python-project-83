@@ -13,18 +13,19 @@ import uuid
 import logging
 
 
-DEBUG = os.getenv("FLASK_DEBUG")
-
 logger = logging.getLogger(__name__)
+
+try:
+    from dotenv import load_dotenv
+
+    load_dotenv()
+except Exception as e:
+    logger.info(e)
+
+DEBUG = os.getenv("FLASK_DEBUG")
 
 
 def create_app():
-    try:
-        from dotenv import load_dotenv
-
-        load_dotenv()
-    except Exception as e:
-        logger.info(e)
 
     logging.basicConfig(level=(logging.INFO if not DEBUG else logging.DEBUG))
     if DEBUG:
@@ -48,9 +49,9 @@ def index():
 
 @app.route("/urls", methods=["GET"])
 def urls_get():
-    all_urls = get_lastchecks_info()
+    get_urls_with_lastcheck_info = get_lastchecks_info()
     return render_template("all_urls_page.html",
-                           urls=all_urls)
+                           urls=get_urls_with_lastcheck_info)
 
 
 @app.route("/urls/<int:id_>", methods=["GET"])
