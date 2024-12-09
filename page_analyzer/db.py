@@ -4,13 +4,13 @@ import os
 import logging
 
 
+DATABASE_URL = os.getenv("DATABASE_URL")
+
+
 logger = logging.getLogger(__name__)
 
 
 def create_connection():
-
-    DATABASE_URL = os.getenv("DATABASE_URL")
-
     try:
         conn = psycopg2.connect(DATABASE_URL,
                                 cursor_factory=RealDictCursor)
@@ -29,7 +29,7 @@ def save_data(url):
         logger.error(f"Connection error! {e}")
 
 
-def select_urls():
+def get_urls():
     try:
         with create_connection() as conn, conn.cursor() as curs:
             curs.execute("""SELECT id, name, created_at
@@ -41,34 +41,34 @@ def select_urls():
     return []
 
 
-def select_last_check_info(id_):
-    try:
-        with create_connection() as conn, conn.cursor() as curs:
-            curs.execute("""SELECT urls.id,
-                                   urls.name,
-                                   uc.created_at AS last_check,
-                                   uc.status_code AS status_code
-                            FROM url_checks AS uc
-                            FULL JOIN urls ON uc.url_id=urls.id
-                            WHERE urls.id=%s
-                            ORDER BY uc.created_at DESC LIMIT 1
-                            """, [id_])
-            return curs.fetchone()
-    except psycopg2.Error as e:
-        logger.error(f"Connection error! {e}")
+def get_lastcheck_by_url_id(id_):
+    with create_connection() as conn, conn.cursor() as curs:
+        curs.execute("""SELECT urls.id,
+                               urls.name,
+                               uc.created_at AS last_check,
+                               uc.status_code AS status_code
+                        FROM url_checks AS uc
+                        FULL JOIN urls ON uc.url_id=urls.id
+                        WHERE urls.id=%s
+                        ORDER BY uc.created_at DESC LIMIT 1
+                        """, [id_])
+        return curs.fetchone()
 
 
-def select_checkinfo():
-    urls = select_urls()
+def get_lastcheck_info():
+    urls = get_urls()
     checks = []
     for url in urls:
-        info = select_last_check_info(url["id"])
-        if info:
-            checks.append(info)
+        try:
+            info = get_lastcheck_by_url_id(url["id"])
+            if info:
+                checks.append(info)
+        except Exception as e:
+            logger.error(f"Connection error! {e}")
     return checks
 
 
-def select_checks(id_):
+def get_checks_by_url_id(id_):
     try:
         with create_connection() as conn, conn.cursor() as curs:
             curs.execute("""SELECT id, status_code, h1,
@@ -83,19 +83,25 @@ def select_checks(id_):
 
 
 def find_url_by_id(id_):
-    with create_connection() as conn, conn.cursor() as curs:
-        curs.execute("""SELECT id, name, created_at
-                        FROM urls
-                        WHERE id = %s""", [str(id_)])
-        return curs.fetchone()
+    try:
+        with create_connection() as conn, conn.cursor() as curs:
+            curs.execute("""SELECT id, name, created_at
+                            FROM urls
+                            WHERE id = %s""", [str(id_)])
+            return curs.fetchone()
+    except psycopg2.Error as e:
+        logger.error(f"Connection error! {e}")
 
 
 def find_url_by_name(name):
-    with create_connection() as conn, conn.cursor() as curs:
-        curs.execute("""SELECT id, name, created_at
-                        FROM urls
-                        WHERE name = %s""", [name])
-        return curs.fetchone()
+    try:
+        with create_connection() as conn, conn.cursor() as curs:
+            curs.execute("""SELECT id, name, created_at
+                            FROM urls
+                            WHERE name = %s""", [name])
+            return curs.fetchone()
+    except psycopg2.Error as e:
+        logger.error(f"Connection error! {e}")
 
 
 def save_check(id_, *, status_code=None,
@@ -114,5 +120,5 @@ def save_check(id_, *, status_code=None,
                           title,
                           h1,
                           description])
-    except Exception as e:
-        logger.error(e)
+    except psycopg2.Error as e:
+        logger.error(f"Connection error! {e}")

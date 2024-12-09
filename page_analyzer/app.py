@@ -1,5 +1,5 @@
 from page_analyzer.db import (save_data,
-                              select_checks, select_checkinfo,
+                              get_checks_by_url_id, get_lastcheck_info,
                               find_url_by_id, find_url_by_name,
                               save_check)
 from page_analyzer.utils import url_validate, url_normalize
@@ -53,7 +53,7 @@ def index():
 
 @app.route("/urls", methods=["GET"])
 def urls_get():
-    all_urls = select_checkinfo()
+    all_urls = get_lastcheck_info()
     return render_template("all_urls_page.html",
                            urls=all_urls)
 
@@ -61,7 +61,7 @@ def urls_get():
 @app.route("/urls/<int:id_>", methods=["GET"])
 def urls_show(id_):
     data = find_url_by_id(id_)
-    checks = select_checks(id_)
+    checks = get_checks_by_url_id(id_)
     return render_template("show.html",
                            data=data,
                            checks=checks)
