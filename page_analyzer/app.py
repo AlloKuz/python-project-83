@@ -11,18 +11,28 @@ import os
 import requests
 
 
-app = Flask(__name__)
+def use_dotenv():
+    try:
+        from dotenv import load_dotenv
+
+        load_dotenv()
+    except Exception as e:
+        print(e)
+
+    
+def create_app():
+    
+    use_dotenv()
+
+    app = Flask(__name__)
+
+    app.config['SECRET_KEY'] = os.getenv("SECRET_KEY")
+    app.config['DATABASE_URL'] = os.getenv("DATABASE_URL")
+
+    return app
 
 
-try:
-    from dotenv import load_dotenv
-
-    load_dotenv()
-except Exception as e:
-    print(e)
-
-app.config['SECRET_KEY'] = os.getenv("SECRET_KEY")
-app.config['DATABASE_URL'] = os.getenv("DATABASE_URL")
+app = create_app()
 
 
 @app.route("/")
@@ -32,7 +42,7 @@ def index():
 
 @app.route("/urls", methods=["GET"])
 def urls_get():
-    all_urls = select_checkinfo() or []
+    all_urls = select_checkinfo()
     return render_template("all_urls_page.html",
                            urls=all_urls)
 

@@ -10,7 +10,6 @@ def app():
     new_app.config.update({
         "TESTING": True,
         "SECRET_KEY": os.getenv("TEST_SECRET_KEY"),
-        "DATABASE_URL": "",
     })
     return new_app
 
