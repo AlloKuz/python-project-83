@@ -75,28 +75,34 @@ def urls_post():
         flash("Некорректный URL", "danger")
         return render_template("index.html", data=data, errors=errors), 422
 
-    new_url = url_normalize(data["url"])
-    old_data = find_url_by_name(new_url)
-    if old_data:
-        flash("Страница уже существует", "info")
-        return redirect(url_for("urls_show", id_=old_data.id))
+    try:
+        new_url = url_normalize(data["url"])
+        old_data = find_url_by_name(new_url)
+        if old_data:
+            flash("Страница уже существует", "info")
+            return redirect(url_for("urls_show", id_=old_data["id"]))
 
-    save_data(new_url)
-    flash("Страница успешно добавлена", "success")
-    new_data = find_url_by_name(new_url)
-    return redirect(url_for("urls_show", id_=new_data.id))
+        save_data(new_url)
+        flash("Страница успешно добавлена", "success")
+        new_data = find_url_by_name(new_url)
+        return redirect(url_for("urls_show", id_=new_data["id"]))
+    except Exception as e:
+        flash("Произошла ошибка при проверке", "danger")
+        logger.error(e)
+    return redirect(url_for("urls_get"))
 
 
 @app.route("/urls/<int:id_>/check", methods=["POST"])
 def urls_check(id_):
-    url_data = find_url_by_id(id_)
-    status_code = None
     try:
-        req = requests.get(url_data.name)
+        url_data = find_url_by_id(id_)
+        status_code = None
+
+        req = requests.get(url_data["name"])
         status_code = req.status_code
         req.raise_for_status()
 
-        parsed_data = parse_html(requests.get(url_data.name).text)
+        parsed_data = parse_html(requests.get(url_data["name"]).text)
 
         if not parsed_data:
             raise Exception("Ошибка при проверке!")

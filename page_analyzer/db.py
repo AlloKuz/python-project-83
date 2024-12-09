@@ -14,7 +14,7 @@ def create_connection():
 
     try:
         conn = psycopg2.connect(DATABASE_URL,
-                                row_factory=DictCursor)
+                                cursor_factory=DictCursor)
         return conn
     except psycopg2.Error as e:
         logger.error(f'Unable to connect!\n{e}')
@@ -64,7 +64,7 @@ def select_checkinfo():
     urls = select_urls()
     checks = []
     for url in urls:
-        info = select_last_check_info(url.id)
+        info = select_last_check_info(url["id"])
         if info:
             checks.append(info)
     return checks
@@ -85,27 +85,19 @@ def select_checks(id_):
 
 
 def find_url_by_id(id_):
-    try:
-        with create_connection() as conn, conn.cursor() as curs:
-            curs.execute("""SELECT id, name, created_at
-                            FROM urls
-                            WHERE id = %s""", [str(id_)])
-            return curs.fetchone()
-    except Exception as e:
-        logger.error(e)
-    return {}
+    with create_connection() as conn, conn.cursor() as curs:
+        curs.execute("""SELECT id, name, created_at
+                        FROM urls
+                        WHERE id = %s""", [str(id_)])
+        return curs.fetchone()
 
 
 def find_url_by_name(name):
-    try:
-        with create_connection() as conn, conn.cursor() as curs:
-            curs.execute("""SELECT id, name, created_at
-                            FROM urls
-                            WHERE name = %s""", [name])
-            return curs.fetchone()
-    except Exception as e:
-        logger.error(e)
-    return {}
+    with create_connection() as conn, conn.cursor() as curs:
+        curs.execute("""SELECT id, name, created_at
+                        FROM urls
+                        WHERE name = %s""", [name])
+        return curs.fetchone()
 
 
 def save_check(id_, *, status_code=None,
