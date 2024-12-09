@@ -1,4 +1,7 @@
-from page_analyzer import db
+from page_analyzer.db import (save_url,
+                              get_checks_by_url_id, get_lastchecks_info,
+                              find_url_by_id, find_url_by_name,
+                              save_check)
 from page_analyzer.utils import url_validate, url_normalize
 from page_analyzer.parser import parse_html
 
@@ -47,17 +50,17 @@ def index():
 
 @app.route("/urls", methods=["GET"])
 def urls_get():
-    get_urls_with_lastcheck_info = db.get_lastchecks_info()
+    get_urls_with_lastcheck_info = get_lastchecks_info()
     return render_template("all_urls_page.html",
                            urls=get_urls_with_lastcheck_info)
 
 
 @app.route("/urls/<int:id_>", methods=["GET"])
 def urls_show(id_):
-    data = db.find_url_by_id(id_)
+    data = find_url_by_id(id_)
     if not data:
         return "Page not found", 404
-    checks = db.get_checks_by_url_id(id_)
+    checks = get_checks_by_url_id(id_)
     return render_template("show.html",
                            data=data,
                            checks=checks)
@@ -73,12 +76,12 @@ def urls_post():
 
     try:
         new_url = url_normalize(data["url"])
-        old_data = db.find_url_by_name(new_url)
+        old_data = find_url_by_name(new_url)
         if old_data:
             flash("Страница уже существует", "info")
             return redirect(url_for("urls_show", id_=old_data["id"]))
 
-        new_data = db.save_url(new_url)
+        new_data = save_url(new_url)
         flash("Страница успешно добавлена", "success")
         return redirect(url_for("urls_show", id_=new_data["id"]))
     except Exception as e:
@@ -90,7 +93,7 @@ def urls_post():
 @app.route("/urls/<int:id_>/check", methods=["POST"])
 def urls_check(id_):
     try:
-        url_data = db.find_url_by_id(id_)
+        url_data = find_url_by_id(id_)
         status_code = None
 
         req = requests.get(url_data["name"])
@@ -101,11 +104,11 @@ def urls_check(id_):
 
         if not parsed_data:
             raise Exception("Ошибка при проверке!")
-        db.save_check(id_,
-                      status_code=status_code,
-                      title=parsed_data["title"],
-                      h1=parsed_data["h1"],
-                      description=parsed_data["description"])
+        save_check(id_,
+                   status_code=status_code,
+                   title=parsed_data["title"],
+                   h1=parsed_data["h1"],
+                   description=parsed_data["description"])
         flash("Страница успешно проверена", "success")
     except Exception as e:
         flash("Произошла ошибка при проверке", "danger")
