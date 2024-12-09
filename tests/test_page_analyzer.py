@@ -1,6 +1,6 @@
-from page_analyzer.app import app as app_
+from page_analyzer.app import app as app_ # type: ignore
 
-import pytest
+import pytest # type: ignore
 import uuid
 
 
