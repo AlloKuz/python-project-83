@@ -2,9 +2,8 @@ from page_analyzer import parser
 
 
 def replaced_parser(path):
-    with open(path) as f:
-        data = f.read()
-        return data
+    with open(path, "r") as f:
+        return f.read()
 
 
 def test_parse_html():
