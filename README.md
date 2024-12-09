@@ -6,7 +6,7 @@
 
 # Анализатор страниц
 
-Сайт: [Анализатор страниц](https://python-project-83-k59a.onrender.com)
+Сайт: [Анализатор страниц](https://python-project-83-vi53.onrender.com)
 
 ## Описание
 
