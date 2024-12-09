@@ -20,9 +20,9 @@ def use_dotenv():
     except Exception as e:
         print(e)
 
-    
+
 def create_app():
-    
+
     use_dotenv()
 
     app = Flask(__name__)
