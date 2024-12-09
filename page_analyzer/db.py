@@ -18,11 +18,12 @@ def create_connection():
         raise e
 
 
-def save_data(url):
+def save_url(url):
     try:
         with create_connection() as conn, conn.cursor() as curs:
             curs.execute("""INSERT INTO urls (name) VALUES
-                            (%s)""", [url])
+                            (%s) RETURNING id""", [url])
+            return curs.fetchone()
     except psycopg2.Error as e:
         logger.error(f"Connection error! {e}")
 
@@ -56,11 +57,10 @@ def get_lastchecks(ids):
             ON urls.id=uc.url_id
         LEFT JOIN most_recent_records AS mrr
             ON uc.url_id=mrr.url_id
-        WHERE mrr.last_check IS NULL OR mrr.last_check=uc.created_at;
+        WHERE mrr.last_check IS NULL OR mrr.last_check=uc.created_at
+        ORDER BY urls.created_at DESC;
     """
     with create_connection() as conn, conn.cursor() as curs:
-        print(ids)
-        print(curs.mogrify(sql, (ids,)))
         curs.execute(sql, (ids,))
         return curs.fetchall()
 

@@ -1,4 +1,4 @@
-from page_analyzer.db import (save_data,
+from page_analyzer.db import (save_url,
                               get_checks_by_url_id, get_lastchecks_info,
                               find_url_by_id, find_url_by_name,
                               save_check)
@@ -18,18 +18,13 @@ DEBUG = os.getenv("FLASK_DEBUG")
 logger = logging.getLogger(__name__)
 
 
-def use_dotenv():
+def create_app():
     try:
         from dotenv import load_dotenv
 
         load_dotenv()
     except Exception as e:
         logger.info(e)
-
-
-def create_app():
-
-    use_dotenv()
 
     logging.basicConfig(level=(logging.INFO if not DEBUG else logging.DEBUG))
     if DEBUG:
@@ -84,9 +79,8 @@ def urls_post():
             flash("Страница уже существует", "info")
             return redirect(url_for("urls_show", id_=old_data["id"]))
 
-        save_data(new_url)
+        new_data = save_url(new_url)
         flash("Страница успешно добавлена", "success")
-        new_data = find_url_by_name(new_url)
         return redirect(url_for("urls_show", id_=new_data["id"]))
     except Exception as e:
         flash("Произошла ошибка при проверке", "danger")
