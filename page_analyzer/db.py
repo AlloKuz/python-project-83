@@ -1,5 +1,5 @@
 import psycopg2
-from psycopg2.extras import DictCursor
+from psycopg2.extras import RealDictCursor
 import os
 import logging
 
@@ -13,7 +13,7 @@ def create_connection():
 
     try:
         conn = psycopg2.connect(DATABASE_URL,
-                                cursor_factory=DictCursor)
+                                cursor_factory=RealDictCursor)
         return conn
     except psycopg2.Error as e:
         logger.error(f'Unable to connect!\n{e}')
@@ -47,7 +47,7 @@ def select_last_check_info(id_):
             curs.execute("""SELECT urls.id,
                                    urls.name,
                                    uc.created_at AS last_check,
-                                   uc.status_code
+                                   uc.status_code AS status_code
                             FROM url_checks AS uc
                             FULL JOIN urls ON uc.url_id=urls.id
                             WHERE urls.id=%s
@@ -56,7 +56,6 @@ def select_last_check_info(id_):
             return curs.fetchone()
     except psycopg2.Error as e:
         logger.error(f"Connection error! {e}")
-    return {}
 
 
 def select_checkinfo():
