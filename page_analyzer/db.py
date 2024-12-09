@@ -1,7 +1,6 @@
 import psycopg2
 from psycopg2.extras import DictCursor
 import os
-from datetime import datetime
 import logging
 
 
@@ -24,8 +23,8 @@ def create_connection():
 def save_data(url):
     try:
         with create_connection() as conn, conn.cursor() as curs:
-            curs.execute("""INSERT INTO urls (name, created_at) VALUES
-                            (%s, %s)""", [url, datetime.now()])
+            curs.execute("""INSERT INTO urls (name) VALUES
+                            (%s)""", [url])
     except psycopg2.Error as e:
         logger.error(f"Connection error! {e}")
 
@@ -106,14 +105,12 @@ def save_check(id_, *, status_code=None,
         with create_connection() as conn, conn.cursor() as curs:
             curs.execute("""INSERT INTO url_checks
                             (url_id,
-                             created_at,
                              status_code,
                              title,
                              h1,
                              description)
-                            VALUES (%s, %s, %s, %s, %s, %s)""",
+                            VALUES (%s, %s, %s, %s, %s)""",
                          [id_,
-                          datetime.now(),
                           status_code,
                           title,
                           h1,
