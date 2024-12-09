@@ -51,7 +51,7 @@ def select_checkinfo():
                         SELECT url_id, MAX(created_at) last_check
                         FROM url_checks
                         GROUP BY url_id)
-                        
+
                         SELECT urls.id, urls.name, lr.last_check, uc.status_code
                         FROM urls
                         LEFT JOIN last_record as lr
@@ -98,7 +98,7 @@ def find_url_by_name(name):
 
 
 def save_check(id_, *, status_code=None):
-        with create_connection() as conn, conn.cursor() as curs:
-            curs.execute("""INSERT INTO url_checks (url_id, created_at, status_code)
+    with create_connection() as conn, conn.cursor() as curs:
+        curs.execute("""INSERT INTO url_checks (url_id, created_at, status_code)
                         VALUES (%s, %s, %s)""",
-                     [id_, datetime.now(), status_code])
+                    [id_, datetime.now(), status_code])
