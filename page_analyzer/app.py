@@ -93,7 +93,8 @@ def urls_check(id_):
         save_check(id_,
                    status_code=status_code,
                    title=parsed_data["title"],
-                   h1=parsed_data["h1"])
+                   h1=parsed_data["h1"],
+                   description=parsed_data["description"])
         flash("Страница успешно проверена", "success")
     except Exception as e:
         flash("Произошла ошибка при проверке", "danger")
