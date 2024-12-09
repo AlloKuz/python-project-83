@@ -13,7 +13,16 @@ import requests
 
 app = Flask(__name__)
 
+
+try:
+    from dotenv import load_dotenv
+
+    load_dotenv()
+except Exception as e:
+    print(e)
+
 app.config['SECRET_KEY'] = os.getenv("SECRET_KEY")
+app.config['DATABASE_URL'] = os.getenv("DATABASE_URL")
 
 
 @app.route("/")

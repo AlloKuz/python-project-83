@@ -1,6 +1,5 @@
 import psycopg2
 import os
-from dotenv import load_dotenv
 from datetime import datetime
 from collections import namedtuple
 
@@ -13,7 +12,6 @@ URLCheckTuple = namedtuple("URLtuple",
 
 
 def create_connection():
-    load_dotenv()
 
     DATABASE_URL = os.getenv("DATABASE_URL")
 
