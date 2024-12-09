@@ -1,7 +1,8 @@
-from page_analyzer.app import app as app_
+import uuid
 
 import pytest
-import uuid
+
+from page_analyzer.app import app as app_
 
 
 @pytest.fixture

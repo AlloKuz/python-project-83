@@ -1,6 +1,6 @@
-from page_analyzer.utils import url_validate, url_normalize
-
 import pytest
+
+from page_analyzer.utils import url_normalize, url_validate
 
 
 @pytest.mark.parametrize("url, answer", [

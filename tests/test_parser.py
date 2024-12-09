@@ -1,6 +1,6 @@
-from page_analyzer import parser
-
 import pytest
+
+from page_analyzer import parser
 
 FIXTURES_PATH = "tests/fixtures"
 
