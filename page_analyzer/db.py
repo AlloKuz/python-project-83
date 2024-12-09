@@ -47,23 +47,18 @@ def select_urls():
 def select_checkinfo():
     data = []
     with create_connection() as conn, conn.cursor() as curs:
-        curs.execute("""SELECT url.id,
-                               url.name,
-                               last_t.created_at,
-                               last_t.status_code
-                        FROM urls AS url
-                            LEFT JOIN url_checks AS chck
-                            ON url.id=chck.url_id
-                            LEFT JOIN (
-                                SELECT url_id,
-                                       created_at,
-                                       status_code
-                                FROM url_checks
-                                ORDER BY created_at DESC
-                                LIMIT 1
-                                ) AS last_t
-                                ON chck.url_id=last_t.url_id
-                        ORDER BY last_t.created_at DESC""")
+        curs.execute("""WITH last_record AS (
+                        SELECT url_id, MAX(created_at) last_check
+                        FROM url_checks
+                        GROUP BY url_id)
+                        
+                        SELECT urls.id, urls.name, lr.last_check, uc.status_code
+                        FROM urls
+                        LEFT JOIN last_record as lr
+                            ON urls.id=lr.url_id
+                        LEFT JOIN url_checks uc ON urls.id=uc.url_id
+                        ORDER BY uc.created_at;
+                        """)
         for el in curs.fetchall():
             data.append(URLCheckTuple._make(el))
     return data
@@ -90,7 +85,20 @@ def find_url_by_id(id_):
         return URLtuple._make(curs.fetchone())
 
 
-def save_url(id_):
-    with create_connection() as conn, conn.cursor() as curs:
-        curs.execute("""INSERT INTO url_checks (url_id, created_at)
-                        VALUES (%s, %s)""", [id_, datetime.now()])
+def find_url_by_name(name):
+    try:
+        with create_connection() as conn, conn.cursor() as curs:
+            curs.execute("""SELECT id, name, created_at
+                            FROM urls
+                            WHERE name = %s""", [name])
+            return URLtuple._make(curs.fetchone())
+    except Exception as e:
+        print(e)
+    return False
+
+
+def save_check(id_, *, status_code=None):
+        with create_connection() as conn, conn.cursor() as curs:
+        curs.execute("""INSERT INTO url_checks (url_id, created_at, status_code)
+                        VALUES (%s, %s, %s)""",
+                     [id_, datetime.now(), status_code])
