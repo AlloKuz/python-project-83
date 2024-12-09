@@ -49,7 +49,7 @@ def urls_post():
         flash("Страница уже существует", "info")
         return redirect(url_for("urls_show", id_=old_data.id))
 
-   save_data(new_url)
+    save_data(new_url)
     flash("Страница успешно добавлена", "success")
     new_data = find_url_by_name(new_url)
     return redirect(url_for("urls_show", id_=new_data.id))
