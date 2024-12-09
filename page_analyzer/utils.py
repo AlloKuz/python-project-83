@@ -2,7 +2,7 @@ import validators
 from urllib.parse import urlparse
 
 
-def url_validator(data):
+def url_validate(data):
     if len(data["url"]) > 255:
         return {"url": "URL is too long"}
 

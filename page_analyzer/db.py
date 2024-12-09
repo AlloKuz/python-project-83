@@ -19,9 +19,9 @@ def create_connection():
 
     try:
         conn = psycopg2.connect(DATABASE_URL)
+        return conn
     except psycopg2.Error as e:
         print('Unable to connect!\n{0}'.format(e))
-    return conn
 
 
 def save_data(url):
