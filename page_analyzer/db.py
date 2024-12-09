@@ -4,15 +4,13 @@ import os
 import logging
 
 
-DATABASE_URL = os.getenv("DATABASE_URL")
-
-
 logger = logging.getLogger(__name__)
 
 
 def create_connection():
+    db_url = os.getenv("DATABASE_URL")
     try:
-        conn = psycopg2.connect(DATABASE_URL,
+        conn = psycopg2.connect(db_url,
                                 cursor_factory=RealDictCursor)
         return conn
     except psycopg2.Error as e:
