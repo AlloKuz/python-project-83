@@ -1,6 +1,6 @@
-from page_analyzer.utils import url_validate, url_normalize # type: ignore
+from page_analyzer.utils import url_validate, url_normalize  # type: ignore
 
-import pytest # type: ignore
+import pytest  # type: ignore
 
 
 @pytest.mark.parametrize("url, answer", [
