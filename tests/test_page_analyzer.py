@@ -7,10 +7,8 @@ import uuid
 @pytest.fixture
 def app():
     new_app = app_
-    new_app.config.update({
-        "TESTING": True,
-        "SECRET_KEY": str(uuid.uuid4()),
-    })
+    new_app.config["TESTING"] = True,
+    new_app.config["SECRET_KEY"] = str(uuid.uuid4())
     return new_app
 
 
@@ -25,5 +23,6 @@ def runner(app):
 
 
 def test_index(client):
-    response = client.get("/")
-    assert "Бесплатно проверяйте сайты на SEO-пригодность" in response.text
+    with client:
+        response = client.get("/")
+        assert "Бесплатно проверяйте сайты на SEO-пригодность" in response.text
