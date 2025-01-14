@@ -95,7 +95,7 @@ def urls_check(id_):
     try:
         response = requests.get(url_data["name"])
         response.raise_for_status()
-        
+
         parsed_data = parse_html(response.text)
 
         save_check(
