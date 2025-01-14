@@ -22,4 +22,3 @@
 make install start
 ```
 
-## Примеры работы

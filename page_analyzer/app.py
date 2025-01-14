@@ -90,25 +90,27 @@ def urls_post():
 
 @app.route("/urls/<int:id_>/check", methods=["POST"])
 def urls_check(id_):
+    url_data = find_url_by_id(id_)
+
     try:
-        url_data = find_url_by_id(id_)
-        status_code = None
+        response = requests.get(url_data["name"])
+        response.raise_for_status()
+        
+        parsed_data = parse_html(response.text)
 
-        req = requests.get(url_data["name"])
-        status_code = req.status_code
-        req.raise_for_status()
-
-        parsed_data = parse_html(requests.get(url_data["name"]).text)
-
-        if not parsed_data:
-            raise Exception("Ошибка при проверке!")
-        save_check(id_,
-                   status_code=status_code,
-                   title=parsed_data["title"],
-                   h1=parsed_data["h1"],
-                   description=parsed_data["description"])
+        save_check(
+            id_,
+            status_code=response.status_code,
+            title=parsed_data["title"],
+            h1=parsed_data["h1"],
+            description=parsed_data["description"]
+        )
         flash("Страница успешно проверена", "success")
-    except Exception as e:
-        flash("Произошла ошибка при проверке", "danger")
+    except requests.RequestException as e:
+        flash("Произошла ошибка при проверке URL", "danger")
         logger.error(e)
+    except Exception as e:
+        flash("Произошла ошибка при обработке данных", "danger")
+        logger.error(e)
+
     return redirect(url_for("urls_show", id_=id_))

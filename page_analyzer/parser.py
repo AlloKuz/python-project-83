@@ -12,6 +12,8 @@ def parse_html(html_text):
                             attrs={"name": "description"})
     if description:
         description = description.get("content")
-    return {"title": soup.title.text,
+    return {
+        "title": soup.title.text,
             "h1": h1_tag.text if h1_tag else None,
-            "description": description}
+            "description": description
+            }
